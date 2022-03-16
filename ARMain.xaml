@@ -1,14 +1,19 @@
-<Activity mc:Ignorable="sap sap2010" x:Class="ARMain" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=mscorlib" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<Activity mc:Ignorable="sap sap2010" x:Class="ARMain" this:ARMain.TargetQueueName="ur_request_q" this:ARMain.TargetAction="start" this:ARMain.TargetFolderName="Dev" this:ARMain.ReplyQueueName="ar_reply_q" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib" xmlns:this="clr-namespace:" xmlns:u="clr-namespace:UiPathTeam_StatusProgress_Activities;assembly=UiPathTeam.StatusProgress.Activities" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <x:Members>
-    <x:Property Name="TargetVMNames" Type="InArgument(x:String)" />
+    <x:Property Name="TargetVMNames" Type="InArgument(s:String[])" />
+    <x:Property sap2010:Annotation.AnnotationText=", 로 구분된 VM이름이 넘어감 " Name="TargetQueueName" Type="InArgument(x:String)" />
+    <x:Property Name="TargetAction" Type="InArgument(x:String)" />
+    <x:Property Name="RequestEmail" Type="InArgument(x:String)" />
+    <x:Property Name="TargetFolderName" Type="InArgument(x:String)" />
+    <x:Property Name="ReplyQueueName" Type="InArgument(x:String)" />
   </x:Members>
   <mva:VisualBasic.Settings>
     <x:Null />
   </mva:VisualBasic.Settings>
-  <sap:VirtualizedContainerService.HintSize>968,729</sap:VirtualizedContainerService.HintSize>
+  <sap:VirtualizedContainerService.HintSize>878,1932</sap:VirtualizedContainerService.HintSize>
   <sap2010:WorkflowViewState.IdRef>ARMain_1</sap2010:WorkflowViewState.IdRef>
   <TextExpression.NamespacesForImplementation>
-    <sco:Collection x:TypeArguments="x:String">
+    <scg:List x:TypeArguments="x:String" Capacity="37">
       <x:String>System.Activities</x:String>
       <x:String>System.Activities.Statements</x:String>
       <x:String>System.Activities.Expressions</x:String>
@@ -33,10 +38,23 @@
       <x:String>System.Collections.ObjectModel</x:String>
       <x:String>System.Runtime.InteropServices</x:String>
       <x:String>System.Reflection</x:String>
-    </sco:Collection>
+      <x:String>System.Runtime.Serialization</x:String>
+      <x:String>System.Activities.DynamicUpdate</x:String>
+      <x:String>UiPath.Core.Activities.Orchestrator</x:String>
+      <x:String>System.Windows.Forms</x:String>
+      <x:String>System.ComponentModel</x:String>
+      <x:String>System.Windows.Forms.Layout</x:String>
+      <x:String>UiPathTeam_StatusProgress_Activities</x:String>
+      <x:String>System.Text.RegularExpressions</x:String>
+      <x:String>Newtonsoft.Json</x:String>
+      <x:String>Newtonsoft.Json.Linq</x:String>
+      <x:String>Microsoft.VisualBasic.CompilerServices</x:String>
+      <x:String>System.Windows.Forms.Automation</x:String>
+      <x:String>System.Xml.Serialization</x:String>
+    </scg:List>
   </TextExpression.NamespacesForImplementation>
   <TextExpression.ReferencesForImplementation>
-    <sco:Collection x:TypeArguments="AssemblyReference">
+    <scg:List x:TypeArguments="AssemblyReference" Capacity="31">
       <AssemblyReference>System.Activities</AssemblyReference>
       <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
       <AssemblyReference>mscorlib</AssemblyReference>
@@ -61,15 +79,183 @@
       <AssemblyReference>System.Memory</AssemblyReference>
       <AssemblyReference>UiPath.Excel</AssemblyReference>
       <AssemblyReference>System.Memory.Data</AssemblyReference>
-      <AssemblyReference>System.Runtime.WindowsRuntime</AssemblyReference>
       <AssemblyReference>System.Reflection.Metadata</AssemblyReference>
-    </sco:Collection>
+      <AssemblyReference>System.Runtime.Serialization</AssemblyReference>
+      <AssemblyReference>System.Windows.Forms</AssemblyReference>
+      <AssemblyReference>UiPathTeam.StatusProgress.Activities</AssemblyReference>
+      <AssemblyReference>Newtonsoft.Json</AssemblyReference>
+      <AssemblyReference>UiPath.Azure</AssemblyReference>
+      <AssemblyReference>System.Runtime.WindowsRuntime</AssemblyReference>
+    </scg:List>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="ARMain" sap:VirtualizedContainerService.HintSize="200,84" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence sap2010:Annotation.AnnotationText="Apps에서 호출되는 프로세스로 시작해야 할 VM선택하고 UR이 동작하는 큐에 데이터를 넣어주면 UR이 동작하고결과를 기다렸다가 사용자에게 출력하는 프로세스 " DisplayName="ARMain" sap:VirtualizedContainerService.HintSize="634,1867" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="ui:QueueItem" Name="q_item" />
+      <Variable x:TypeArguments="x:String" Name="ar_reply_queue" />
+      <Variable x:TypeArguments="scg:Dictionary(x:String, x:Object)" Name="queue_body">
+        <Variable.Default>
+          <mva:VisualBasicValue x:TypeArguments="scg:Dictionary(x:String, x:Object)" ExpressionText="new Dictionary(of string, object)" />
+        </Variable.Default>
+      </Variable>
+      <Variable x:TypeArguments="x:String" Name="json_resp" />
+      <Variable x:TypeArguments="x:Int32" Name="status_code" />
+      <Variable x:TypeArguments="scg:Dictionary(x:String, x:String)" Name="req_hdrs">
+        <Variable.Default>
+          <mva:VisualBasicValue x:TypeArguments="scg:Dictionary(x:String, x:String)" ExpressionText="new Dictionary(of string, string)" />
+        </Variable.Default>
+      </Variable>
+    </Sequence.Variables>
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
+    <ui:MultipleAssign DisplayName="Multiple Assign" sap:VirtualizedContainerService.HintSize="592,255" sap2010:WorkflowViewState.IdRef="MultipleAssign_2">
+      <ui:MultipleAssign.AssignOperations>
+        <scg:List x:TypeArguments="ui:AssignOperation" Capacity="8">
+          <ui:AssignOperation sap2010:WorkflowViewState.IdRef="AssignOperation_2">
+            <ui:AssignOperation.To>
+              <OutArgument x:TypeArguments="x:Object">[queue_body("Name")]</OutArgument>
+            </ui:AssignOperation.To>
+            <ui:AssignOperation.Value>
+              <InArgument x:TypeArguments="x:Object">[System.Guid.NewGuid().ToString]</InArgument>
+            </ui:AssignOperation.Value>
+          </ui:AssignOperation>
+          <ui:AssignOperation sap2010:WorkflowViewState.IdRef="AssignOperation_3">
+            <ui:AssignOperation.To>
+              <OutArgument x:TypeArguments="x:Object">[queue_body("MaxNumberOfRetries")]</OutArgument>
+            </ui:AssignOperation.To>
+            <ui:AssignOperation.Value>
+              <InArgument x:TypeArguments="x:Object">[1]</InArgument>
+            </ui:AssignOperation.Value>
+          </ui:AssignOperation>
+          <ui:AssignOperation sap2010:WorkflowViewState.IdRef="AssignOperation_5">
+            <ui:AssignOperation.To>
+              <OutArgument x:TypeArguments="x:Object">[queue_body("OrganizationUnitFullyQualifiedName")]</OutArgument>
+            </ui:AssignOperation.To>
+            <ui:AssignOperation.Value>
+              <InArgument x:TypeArguments="x:Object">["Dev"]</InArgument>
+            </ui:AssignOperation.Value>
+          </ui:AssignOperation>
+          <ui:AssignOperation sap2010:WorkflowViewState.IdRef="AssignOperation_6">
+            <ui:AssignOperation.To>
+              <OutArgument x:TypeArguments="x:String">[ar_reply_queue]</OutArgument>
+            </ui:AssignOperation.To>
+            <ui:AssignOperation.Value>
+              <InArgument x:TypeArguments="x:String">[queue_body("Name").ToString]</InArgument>
+            </ui:AssignOperation.Value>
+          </ui:AssignOperation>
+          <ui:AssignOperation sap2010:WorkflowViewState.IdRef="AssignOperation_7">
+            <ui:AssignOperation.To>
+              <OutArgument x:TypeArguments="x:String">[req_hdrs("X-UIPATH-OrganizationUnitId")]</OutArgument>
+            </ui:AssignOperation.To>
+            <ui:AssignOperation.Value>
+              <InArgument x:TypeArguments="x:String">78442</InArgument>
+            </ui:AssignOperation.Value>
+          </ui:AssignOperation>
+          <ui:AssignOperation sap2010:WorkflowViewState.IdRef="AssignOperation_8">
+            <ui:AssignOperation.To>
+              <OutArgument x:TypeArguments="x:String">[req_hdrs("ContentType")]</OutArgument>
+            </ui:AssignOperation.To>
+            <ui:AssignOperation.Value>
+              <InArgument x:TypeArguments="x:String">application/json</InArgument>
+            </ui:AssignOperation.Value>
+          </ui:AssignOperation>
+        </scg:List>
+      </ui:MultipleAssign.AssignOperations>
+    </ui:MultipleAssign>
+    <ui:OrchestratorHttpRequest TimeoutMS="{x:Null}" sap2010:Annotation.AnnotationText="동적으로 새로운 Queue를 만들어 사용하고 사용한 이후 제거 함." DisplayName="Orchestrator HTTP Request" FolderPath="Dev" sap:VirtualizedContainerService.HintSize="592,82" sap2010:WorkflowViewState.IdRef="OrchestratorHttpRequest_1" JSONPayload="[Newtonsoft.Json.JsonConvert.SerializeObject( queue_body)]" Method="POST" RelativeEndpoint="/odata/QueueDefinitions" ResponseHeaders="[req_hdrs]" Result="[json_resp]" StatusCode="[status_code]">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+    </ui:OrchestratorHttpRequest>
+    <ui:AddQueueItem ServiceBaseAddress="{x:Null}" TimeoutMS="{x:Null}" sap2010:Annotation.AnnotationText="임의로 생성된 Queue를 할당 " DisplayName="Add Queue Item" FolderPath="[TargetFolderName]" sap:VirtualizedContainerService.HintSize="592,53" sap2010:WorkflowViewState.IdRef="AddQueueItem_1" Priority="Normal" QueueType="[TargetQueueName]">
+      <ui:AddQueueItem.ItemInformation>
+        <InArgument x:TypeArguments="x:String" x:Key="VMNames">
+          <mva:VisualBasicValue x:TypeArguments="x:String" ExpressionText="string.Join(&quot;, &quot;, TargetVMNames)" />
+        </InArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="ReplyQueueName">
+          <mva:VisualBasicValue x:TypeArguments="x:String" ExpressionText="ar_reply_queue" />
+        </InArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="Action">
+          <Literal x:TypeArguments="x:String">start</Literal>
+        </InArgument>
+      </ui:AddQueueItem.ItemInformation>
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+    </ui:AddQueueItem>
+    <u:Live_Status ColorText="{x:Null}" Container="{x:Null}" Mobile="{x:Null}" ColorBackground="black" ColorBorder="black" DisplayName="Live Status" sap:VirtualizedContainerService.HintSize="592,22" sap2010:WorkflowViewState.IdRef="Live_Status_1" Location="[{&quot;top&quot;,&quot;left&quot;}]" Message="해당 작업을 담당할 로봇이 완료할때 까지 기다리고 있습니다. " Opacity="0.6" Progress="-1" Top="True">
+      <u:Live_Status.ProgressAutoClose>
+        <InArgument x:TypeArguments="x:Boolean" />
+      </u:Live_Status.ProgressAutoClose>
+    </u:Live_Status>
+    <ui:InterruptibleDoWhile Condition="True" DisplayName="Do While" sap:VirtualizedContainerService.HintSize="592,1159" sap2010:WorkflowViewState.IdRef="InterruptibleDoWhile_1">
+      <ui:InterruptibleDoWhile.Body>
+        <Sequence DisplayName="Body" sap:VirtualizedContainerService.HintSize="556,992" sap2010:WorkflowViewState.IdRef="Sequence_2">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+          <ui:WaitQueueItem Reference="{x:Null}" TimeoutMS="{x:Null}" ContinueOnError="True" DisplayName="Wait Queue Item" FilterStrategy="StartsWith" FolderPath="[TargetFolderName]" sap:VirtualizedContainerService.HintSize="514,80" sap2010:WorkflowViewState.IdRef="WaitQueueItem_1" PollTimeMS="30000" QueueName="[ar_reply_queue]" Result="[q_item]" />
+          <If Condition="[q_item isNot Nothing]" sap:VirtualizedContainerService.HintSize="514,780" sap2010:WorkflowViewState.IdRef="If_1">
+            <If.Then>
+              <Sequence sap:VirtualizedContainerService.HintSize="478,591" sap2010:WorkflowViewState.IdRef="Sequence_3">
+                <sap:WorkflowViewStateService.ViewState>
+                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                    <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                  </scg:Dictionary>
+                </sap:WorkflowViewStateService.ViewState>
+                <ui:UseForegroundScope WaitForeground="{x:Null}" DisplayName="Use Foreground" sap:VirtualizedContainerService.HintSize="436,317" sap2010:WorkflowViewState.IdRef="UseForegroundScope_1">
+                  <ui:UseForegroundScope.Body>
+                    <ActivityAction x:TypeArguments="x:Object">
+                      <Sequence DisplayName="Do" sap:VirtualizedContainerService.HintSize="376,239" sap2010:WorkflowViewState.IdRef="Sequence_5">
+                        <sap:WorkflowViewStateService.ViewState>
+                          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                          </scg:Dictionary>
+                        </sap:WorkflowViewStateService.ViewState>
+                        <u:Close_Status Container="{x:Null}" DisplayName="Close Status" sap:VirtualizedContainerService.HintSize="334,22" sap2010:WorkflowViewState.IdRef="Close_Status_1" />
+                        <ui:MessageBox Caption="{x:Null}" ChosenButton="{x:Null}" AutoCloseAfter="00:00:00" DisplayName="Message Box" sap:VirtualizedContainerService.HintSize="334,85" sap2010:WorkflowViewState.IdRef="MessageBox_1" Text="[q_item.SpecificContent(&quot;ReplyMessage&quot;).ToString]" />
+                      </Sequence>
+                    </ActivityAction>
+                  </ui:UseForegroundScope.Body>
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                      <x:Boolean x:Key="IsPinned">False</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                </ui:UseForegroundScope>
+                <ui:SetTransactionStatus ContinueOnError="{x:Null}" Reason="{x:Null}" ServiceBaseAddress="{x:Null}" TimeoutMS="{x:Null}" DisplayName="Set Transaction Status" ErrorType="Business" sap:VirtualizedContainerService.HintSize="436,80" sap2010:WorkflowViewState.IdRef="SetTransactionStatus_1" Status="Successful" TransactionItem="[q_item]">
+                  <ui:SetTransactionStatus.Analytics>
+                    <scg:Dictionary x:TypeArguments="x:String, InArgument" />
+                  </ui:SetTransactionStatus.Analytics>
+                  <ui:SetTransactionStatus.Output>
+                    <scg:Dictionary x:TypeArguments="x:String, InArgument" />
+                  </ui:SetTransactionStatus.Output>
+                </ui:SetTransactionStatus>
+                <ui:Break sap:VirtualizedContainerService.HintSize="436,22" sap2010:WorkflowViewState.IdRef="Break_1" />
+              </Sequence>
+            </If.Then>
+            <If.Else>
+              <Sequence sap2010:WorkflowViewState.IdRef="Sequence_4">
+                <sap:WorkflowViewStateService.ViewState>
+                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                    <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                  </scg:Dictionary>
+                </sap:WorkflowViewStateService.ViewState>
+              </Sequence>
+            </If.Else>
+          </If>
+        </Sequence>
+      </ui:InterruptibleDoWhile.Body>
+    </ui:InterruptibleDoWhile>
   </Sequence>
 </Activity>

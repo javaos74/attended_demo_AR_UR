@@ -7,7 +7,7 @@
   <mva:VisualBasic.Settings>
     <x:Null />
   </mva:VisualBasic.Settings>
-  <sap:VirtualizedContainerService.HintSize>968,2818</sap:VirtualizedContainerService.HintSize>
+  <sap:VirtualizedContainerService.HintSize>878,2925</sap:VirtualizedContainerService.HintSize>
   <sap2010:WorkflowViewState.IdRef>ActivityBuilder_1</sap2010:WorkflowViewState.IdRef>
   <TextExpression.NamespacesForImplementation>
     <scg:List x:TypeArguments="x:String" Capacity="31">
@@ -45,7 +45,7 @@
     </scg:List>
   </TextExpression.NamespacesForImplementation>
   <TextExpression.ReferencesForImplementation>
-    <scg:List x:TypeArguments="AssemblyReference" Capacity="20">
+    <scg:List x:TypeArguments="AssemblyReference" Capacity="40">
       <AssemblyReference>System.Activities</AssemblyReference>
       <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
       <AssemblyReference>mscorlib</AssemblyReference>
@@ -66,24 +66,29 @@
       <AssemblyReference>System.Reflection.Metadata</AssemblyReference>
       <AssemblyReference>UiPath.Azure</AssemblyReference>
       <AssemblyReference>UiPath.Azure.Activities</AssemblyReference>
+      <AssemblyReference>System.ServiceModel</AssemblyReference>
+      <AssemblyReference>Microsoft.Bcl.AsyncInterfaces</AssemblyReference>
+      <AssemblyReference>System.ValueTuple</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
+      <AssemblyReference>UiPath.Excel</AssemblyReference>
+      <AssemblyReference>System.Memory.Data</AssemblyReference>
+      <AssemblyReference>System.Collections.Immutable</AssemblyReference>
+      <AssemblyReference>System.Runtime.WindowsRuntime</AssemblyReference>
     </scg:List>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="UR Main" sap:VirtualizedContainerService.HintSize="712,2753" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence sap2010:Annotation.AnnotationText="큐 트리거를 통해서 호출되거나, 직접 Queue를 지정해서 호출가능, &#xA;&#xA;호출되면 큐에서 데이터를 가져와서 지정된 VM의 상태를 변경(Start로 교체하는 작업)을 수행하고 결과를 매개변수로 넘겨준 Queue에 기록한다. " DisplayName="UR Main" sap:VirtualizedContainerService.HintSize="712,2860" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
       <Variable x:TypeArguments="x:String" Name="client_id" />
       <Variable x:TypeArguments="ss:SecureString" Name="client_secret" />
       <Variable x:TypeArguments="uam:VirtualMachine[]" Name="vm_list" />
       <Variable x:TypeArguments="ui:QueueItem" Name="q_item" />
       <Variable x:TypeArguments="s:String[]" Name="vm_names" />
-      <Variable x:TypeArguments="scg:List(x:String)" Name="job_result_list">
-        <Variable.Default>
-          <mva:VisualBasicValue x:TypeArguments="scg:List(x:String)" ExpressionText="new List(Of string)" />
-        </Variable.Default>
-      </Variable>
+      <Variable x:TypeArguments="scg:List(x:String)" Default="[new List(Of string)]" Name="job_result_list" />
     </Sequence.Variables>
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
     <ui:GetRobotCredential TimeoutMS="{x:Null}" AssetName="AzureClientSecret" DisplayName="Get Credential" FolderPath="Dev" sap:VirtualizedContainerService.HintSize="670,80" sap2010:WorkflowViewState.IdRef="GetRobotCredential_1" Password="[client_secret]" Username="[client_id]" />
@@ -123,7 +128,7 @@
         </Sequence>
       </If.Else>
     </If>
-    <ui:MultipleAssign DisplayName="Multiple Assign" sap:VirtualizedContainerService.HintSize="670,100" sap2010:WorkflowViewState.IdRef="MultipleAssign_2">
+    <ui:MultipleAssign DisplayName="Multiple Assign" sap:VirtualizedContainerService.HintSize="670,131" sap2010:WorkflowViewState.IdRef="MultipleAssign_2">
       <ui:MultipleAssign.AssignOperations>
         <scg:List x:TypeArguments="ui:AssignOperation" Capacity="4">
           <ui:AssignOperation sap2010:WorkflowViewState.IdRef="AssignOperation_2">
@@ -132,6 +137,14 @@
             </ui:AssignOperation.To>
             <ui:AssignOperation.Value>
               <InArgument x:TypeArguments="s:String[]">[q_item.SpecificContent("VMNames").ToString.Trim.Split(","c)]</InArgument>
+            </ui:AssignOperation.Value>
+          </ui:AssignOperation>
+          <ui:AssignOperation sap2010:WorkflowViewState.IdRef="AssignOperation_5">
+            <ui:AssignOperation.To>
+              <OutArgument x:TypeArguments="x:String">[in_ReplyQueueName]</OutArgument>
+            </ui:AssignOperation.To>
+            <ui:AssignOperation.Value>
+              <InArgument x:TypeArguments="x:String">[IF( string.IsNullOrEmpty( in_ReplyQueueName), q_item.SpecificContent("ReplyQueueName").ToString, in_ReplyQueueName)]</InArgument>
             </ui:AssignOperation.Value>
           </ui:AssignOperation>
         </scg:List>
@@ -190,7 +203,7 @@
                                     </scg:Dictionary>
                                   </sap:WorkflowViewStateService.ViewState>
                                 </uaa:AzureStartVirtualMachine>
-                                <AddToCollection x:TypeArguments="x:String" Collection="[job_result_list]" DisplayName="Add To Collection" sap:VirtualizedContainerService.HintSize="200,22" sap2010:WorkflowViewState.IdRef="AddToCollection`1_1" Item="[String.Format( &quot;VM {0} now {1}&quot;, vm.Name, vm.PowerState)]" />
+                                <AddToCollection x:TypeArguments="x:String" Collection="[job_result_list]" DisplayName="Add To Collection" sap:VirtualizedContainerService.HintSize="200,22" sap2010:WorkflowViewState.IdRef="AddToCollection`1_1" Item="[String.Format( &quot;VM {0}가 이제 {1}&quot;, vm.Name, &quot; 시작됨&quot;)]" />
                               </Sequence>
                             </TryCatch.Try>
                             <TryCatch.Catches>
@@ -267,9 +280,7 @@
           </sap:WorkflowViewStateService.ViewState>
           <ui:AddQueueItem ServiceBaseAddress="{x:Null}" TimeoutMS="{x:Null}" sap2010:Annotation.AnnotationText="지정된 큐에 응답을 추가 " DisplayName="Add Queue Item" FolderPath="Dev" sap:VirtualizedContainerService.HintSize="431.5,53" sap2010:WorkflowViewState.IdRef="AddQueueItem_1" Priority="Normal" QueueType="[in_ReplyQueueName]">
             <ui:AddQueueItem.ItemInformation>
-              <InArgument x:TypeArguments="x:String" x:Key="ReplyMessage">
-                <mva:VisualBasicValue x:TypeArguments="x:String" ExpressionText="string.Join( Environment.NewLine, job_result_list)" />
-              </InArgument>
+              <InArgument x:TypeArguments="x:String" x:Key="ReplyMessage">[string.Join( Environment.NewLine, job_result_list)]</InArgument>
             </ui:AddQueueItem.ItemInformation>
             <sap:WorkflowViewStateService.ViewState>
               <scg:Dictionary x:TypeArguments="x:String, x:Object">
